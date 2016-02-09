@@ -10,7 +10,8 @@ var Map = {
     drawMap: drawMap,
     updateMap: updateMap,
     displayError: displayError,
-    addZoom: addZoom
+    addZoom: addZoom,
+    computeMeteoriteScale: computeMeteoriteScale
 };
 
 module.exports = Map;
@@ -24,7 +25,7 @@ function prepareSVG() {
 function prepareProjections() {
     this.path = d3.geo.path();
     this.projection = d3.geo.mercator().
-        scale(config.baseScale);
+        scale(config.baseMapScale);
     this.path.projection(this.projection);
 }
 
@@ -55,6 +56,8 @@ function processResources() {
     this.meteoriteData.features = this.meteoriteData.features.filter(function(feature) {
         return feature.geometry;
     });
+
+    this.computeMeteoriteScale();
 }
 
 function drawMap() {
@@ -77,9 +80,11 @@ function drawMap() {
         .attr('class', 'meteorite')
         .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
         .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
-        .attr('r', '2');
+        .attr('r', (function(d) { return this.meteoriteScale(d.properties.mass); }).bind(this))
+        .style('fill', (function(d, i) { return config.meteoriteColors[i%config.meteoriteColors.length]; }));
 
     this.addZoom();
+    this.zoom.event(this.wholeMapGroup);
 }
 
 function updateMap() {
@@ -87,10 +92,10 @@ function updateMap() {
     this.wholeMapGroup.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
 
     // Change borders
-    this.wholeMapGroup.selectAll('.country-path').style('stroke-width', 1.5 / d3.event.scale + 'px');
+    this.wholeMapGroup.selectAll('.country-path').style('stroke-width', 1 / d3.event.scale + 'px');
 
-    // Change meteorites
-    this.wholeMapGroup.selectAll('.meteorite').attr('r', 2 / d3.event.scale + 'px');
+    // Change meteorites (disabled, because we zoom not with projection, but by scaling an svg element)
+    //this.wholeMapGroup.selectAll('.meteorite').attr('r', (function(d) { return this.meteoriteScale(d.properties.mass) / d3.event.scale + 'px'; }).bind(this));
 }
 
 function displayError(err) {
@@ -100,11 +105,12 @@ function displayError(err) {
 }
 
 function addZoom() {
-    console.log('Adding zoom');
     this.zoom = d3.behavior.zoom()
         .translate([0, 0])
-        .scale(1)
-        .scaleExtent([1, 8])
+        .scale(config.baseZoomScale)
+        .scaleExtent([config.zoomLimits.min, config.zoomLimits.max])
+        .size([config.width, config.height])
+        .translate([200, 100])
         .on('zoom', this.updateMap.bind(this));
 
     this.map.append('rect')
@@ -112,4 +118,13 @@ function addZoom() {
         .attr('width', config.width)
         .attr('height', config.height)
         .call(this.zoom);
+}
+
+function computeMeteoriteScale() {
+    this.meteoriteScale = d3.scale.linear()
+        .range([config.meteoriteRadius.min, config.meteoriteRadius.max])
+        .domain([
+            d3.min(this.meteoriteData.features, function(d) { return Number(d.properties.mass); }),
+            d3.max(this.meteoriteData.features, function(d) { return Number(d.properties.mass); })
+        ]);
 }

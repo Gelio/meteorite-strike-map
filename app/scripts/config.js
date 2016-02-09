@@ -3,7 +3,17 @@ var config = {
     height: 600,
     mapDataUrl: './countries.geo.json',
     meteoriteDataUrl: './meteorite-strike-data.json',
-    baseScale: 90           // default should be 90
+    baseMapScale: 250,
+    baseZoomScale: 0.5,
+    zoomLimits: {
+        min: 0.5,
+        max: 10
+    },
+    meteoriteRadius: {
+        min: 1,
+        max: 15
+    },
+    meteoriteColors: ['blue', 'red', 'black']
 };
 
 module.exports = config;
