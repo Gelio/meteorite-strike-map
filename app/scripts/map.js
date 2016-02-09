@@ -61,6 +61,11 @@ function processResources() {
         return feature.geometry;
     });
 
+    this.meteoriteData.features = this.meteoriteData.features.map(function(feature) {
+        feature.properties.date = new Date(feature.properties.year);
+        return feature;
+    });
+
     this.computeMeteoriteScale();
 }
 
