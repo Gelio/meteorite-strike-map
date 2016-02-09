@@ -1,6 +1,5 @@
 var config = require('./config.js'),
-    d3 = require('d3'),
-    userInput = require('./user-input.js');
+    d3 = require('d3');
 
 
 var Map = {
@@ -11,7 +10,6 @@ var Map = {
     drawMap: drawMap,
     updateMap: updateMap,
     displayError: displayError,
-    addUserInput: addUserInput,
     addZoom: addZoom
 };
 
@@ -68,6 +66,7 @@ function drawMap() {
         .data(this.countriesData.features)
         .enter()
         .append('path')
+        .attr('class', 'country-path')
         .attr('d', this.path);
 
     this.meteoritesGroup = this.wholeMapGroup.append('g');
@@ -75,36 +74,29 @@ function drawMap() {
         .data(this.meteoriteData.features)
         .enter()
         .append('circle')
+        .attr('class', 'meteorite')
         .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
         .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
         .attr('r', '2');
 
-    this.addUserInput();
     this.addZoom();
 }
 
 function updateMap() {
-    /*
-    var projection = this.projection;
-    this.countriesGroup.selectAll('path')
-        .attr('d', this.path);
-
-    this.meteoritesGroup.selectAll('circle')
-        .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
-        .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
-    */
+    // Transform map
     this.wholeMapGroup.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
-    console.log('Updating');
+
+    // Change borders
+    this.wholeMapGroup.selectAll('.country-path').style('stroke-width', 1.5 / d3.event.scale + 'px');
+
+    // Change meteorites
+    this.wholeMapGroup.selectAll('.meteorite').attr('r', 2 / d3.event.scale + 'px');
 }
 
 function displayError(err) {
     console.error('There\'s been an error while downloading data', err);
     d3.select('.map-wrapper')
         .html('<div class="alert alert-warning">There\'s been an error while downloading data. Please, try again later.</div>');
-}
-
-function addUserInput() {
-    this.userInput = Object.create(userInput);
 }
 
 function addZoom() {
