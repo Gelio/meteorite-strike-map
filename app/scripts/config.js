@@ -10,7 +10,7 @@ var config = {
         max: 10
     },
     meteoriteRadius: {
-        min: 1,
+        min: 2,
         max: 15
     },
     meteoriteColors: ['blue', 'red', 'black']

@@ -1,14 +1,21 @@
-.country-path {
-  fill: none;
-  stroke: black;
+@import 'svg-elements';
+
+.map-wrapper {
+  position: relative;
 }
 
-.meteorite {
-  stroke-width: 1px;
-  stroke: rgba(255, 0, 0, 0.4);
-}
+.map-tooltip {
+  display: none;
 
-.overlay {
-  fill: none;
-  pointer-events: all;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  z-index: 1;
+
+  border: solid 1px;
+  background-color: steelblue;
+
+  &.visible {
+    display: block;
+  }
 }

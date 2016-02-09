@@ -1,4 +1,5 @@
 var config = require('./config.js'),
+    tooltipHandler = require('./tooltip-handler.js'),
     d3 = require('d3');
 
 
@@ -20,6 +21,9 @@ function prepareSVG() {
     this.map = d3.select('.map')
         .attr('width', config.width)
         .attr('height', config.height);
+
+    this.tooltipHandler = tooltipHandler;
+    this.tooltipHandler.init();
 }
 
 function prepareProjections() {
@@ -81,7 +85,9 @@ function drawMap() {
         .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
         .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
         .attr('r', (function(d) { return this.meteoriteScale(d.properties.mass); }).bind(this))
-        .style('fill', (function(d, i) { return config.meteoriteColors[i%config.meteoriteColors.length]; }));
+        .style('fill', (function(d, i) { return config.meteoriteColors[i % config.meteoriteColors.length]; }))
+        .on('mouseover', this.tooltipHandler.displayTooltip.bind(this.tooltipHandler))
+        .on('mouseout', this.tooltipHandler.hideTooltip.bind(this.tooltipHandler));
 
     this.addZoom();
     this.zoom.event(this.wholeMapGroup);
@@ -113,11 +119,7 @@ function addZoom() {
         .translate([200, 100])
         .on('zoom', this.updateMap.bind(this));
 
-    this.map.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', config.width)
-        .attr('height', config.height)
-        .call(this.zoom);
+    this.map.call(this.zoom);
 }
 
 function computeMeteoriteScale() {
