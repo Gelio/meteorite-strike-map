@@ -8,6 +8,7 @@ var Map = {
     loadResources: loadResources,
     processResources: processResources,
     drawMap: drawMap,
+    updateMap: updateMap,
     displayError: displayError
 };
 
@@ -58,7 +59,6 @@ function processResources() {
 function drawMap() {
     var projection = this.projection;
     this.countriesGroup = this.map.append('g');
-
     this.countriesGroup.selectAll('path')
         .data(this.countriesData.features)
         .enter()
@@ -66,13 +66,24 @@ function drawMap() {
         .attr('d', this.path);
 
     this.meteoritesGroup = this.map.append('g');
-    this.meteoritesGroup.selectAll('path')
+    this.meteoritesGroup.selectAll('circle')
         .data(this.meteoriteData.features)
         .enter()
         .append('circle')
-        .attr('cx', function(d) { console.log(d); return projection(d.geometry.coordinates)[0]; })
+        .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
         .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
         .attr('r', '2');
+}
+
+function updateMap() {
+    var projection = this.projection;
+    this.countriesGroup.selectAll('path')
+        .attr('d', this.path);
+
+    this.meteoritesGroup.selectAll('circle')
+        .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
+        .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
+
 }
 
 function displayError(err) {
