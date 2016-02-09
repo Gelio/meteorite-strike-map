@@ -5,7 +5,8 @@
 }
 
 .map-tooltip {
-  display: none;
+  display: block;
+  opacity: 0;
 
   position: absolute;
   top: 50px;
@@ -18,7 +19,11 @@
 
   padding: 1em;
 
+  transition: opacity linear 200ms;
+
+  pointer-events: none;
+
   &.visible {
-    display: block;
+    opacity: 1;
   }
 }
