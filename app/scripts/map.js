@@ -1,5 +1,6 @@
 var config = require('./config.js'),
-    d3 = require('d3');
+    d3 = require('d3'),
+    userInput = require('./user-input.js');
 
 
 var Map = {
@@ -9,7 +10,9 @@ var Map = {
     processResources: processResources,
     drawMap: drawMap,
     updateMap: updateMap,
-    displayError: displayError
+    displayError: displayError,
+    addUserInput: addUserInput,
+    addZoom: addZoom
 };
 
 module.exports = Map;
@@ -58,14 +61,16 @@ function processResources() {
 
 function drawMap() {
     var projection = this.projection;
-    this.countriesGroup = this.map.append('g');
+    this.wholeMapGroup = this.map.append('g');
+
+    this.countriesGroup = this.wholeMapGroup.append('g');
     this.countriesGroup.selectAll('path')
         .data(this.countriesData.features)
         .enter()
         .append('path')
         .attr('d', this.path);
 
-    this.meteoritesGroup = this.map.append('g');
+    this.meteoritesGroup = this.wholeMapGroup.append('g');
     this.meteoritesGroup.selectAll('circle')
         .data(this.meteoriteData.features)
         .enter()
@@ -73,9 +78,13 @@ function drawMap() {
         .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
         .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
         .attr('r', '2');
+
+    this.addUserInput();
+    this.addZoom();
 }
 
 function updateMap() {
+    /*
     var projection = this.projection;
     this.countriesGroup.selectAll('path')
         .attr('d', this.path);
@@ -83,11 +92,32 @@ function updateMap() {
     this.meteoritesGroup.selectAll('circle')
         .attr('cx', function(d) { return projection(d.geometry.coordinates)[0]; })
         .attr('cy', function(d) { return projection(d.geometry.coordinates)[1]; })
-
+    */
+    this.wholeMapGroup.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
+    console.log('Updating');
 }
 
 function displayError(err) {
     console.error('There\'s been an error while downloading data', err);
     d3.select('.map-wrapper')
         .html('<div class="alert alert-warning">There\'s been an error while downloading data. Please, try again later.</div>');
+}
+
+function addUserInput() {
+    this.userInput = Object.create(userInput);
+}
+
+function addZoom() {
+    console.log('Adding zoom');
+    this.zoom = d3.behavior.zoom()
+        .translate([0, 0])
+        .scale(1)
+        .scaleExtent([1, 8])
+        .on('zoom', this.updateMap.bind(this));
+
+    this.map.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', config.width)
+        .attr('height', config.height)
+        .call(this.zoom);
 }
