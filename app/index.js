@@ -1,0 +1,1 @@
+require('boostrap/dist/css/bootstrap.css');

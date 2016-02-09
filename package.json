@@ -1,0 +1,34 @@
+{
+  "name": "meteorite-strike-map",
+  "version": "1.0.0",
+  "description": "An interactive meteorite strike map developed using D3.js",
+  "main": "webpack.config.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gelio/meteorite-strike-map.git"
+  },
+  "author": "Grzegorz Rozdzialik <voreny.gelio@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gelio/meteorite-strike-map/issues"
+  },
+  "homepage": "https://github.com/Gelio/meteorite-strike-map#readme",
+  "devDependencies": {
+    "css-loader": "^0.23.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "node-sass": "^3.4.2",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^3.1.2",
+    "style-loader": "^0.13.0",
+    "webpack": "^1.12.13",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "bootstrap": "^4.0.0-alpha.2",
+    "d3": "^3.5.14"
+  }
+}
